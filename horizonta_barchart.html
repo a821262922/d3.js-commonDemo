@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <title>水平柱状图</title>
+</head>
+<body>
+    <div id="container" style="background:#ddd;width:800px;height: 600px;"></div>
+</body>
+<script>
+    var data=[1,4,7,2,9,13,5,8,2,9],
+    bar_height=50,
+    bar_padding=10,
+    svg_height=(bar_height+bar_padding)*data.length,
+    svg_width=500
+    //缩放
+    var scale = d3.scaleLinear()
+        .domain([0,d3.max(data)])
+        .range([0,svg_width]);
+    //创建svg
+    var svg = d3.select("#container")
+    .append("svg")
+    .attr("width",svg_width)
+    .attr("height",svg_height)
+    //添加柱状图和添加bar
+    var bar = svg.selectAll("g")
+    .data(data)//绑定data数据
+    .enter()//添加元素后赋予属性值
+    .append("g")
+    .attr("transform",function(d,i){return "translate(0,"+i*(bar_height+bar_padding)+")"})//d是数据,i是下标
+    
+    bar.append("rect")//每一个g中创建rect
+    bar.append("text")//每个柱添加文字
+    .text(function(d){return d})
+    .attr("x",function(d){return scale(d)})
+    .attr("y",(bar_height/2+5))
+    .attr("text-anchor","end")
+    var rect=d3.selectAll('rect')
+    //给每一个矩形增加样式和属性
+    rect.style("fill", "steelblue") //设置填充样式
+    rect.attr("width",function(d){return scale(d)})
+    rect.attr("height",bar_height)
+    
+</script>
+</html>

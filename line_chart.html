@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <title>曲线图</title>
+    <!-- 坐标轴刻度线 -->
+    <style>
+        .domain, .tick line{
+            stroke:gray;
+            stroke-width:1;
+        }
+    </style>
+</head>
+<body>
+<div id="container" style="background:#ddd;width:500px;height: 250px;"></div>
+</body>
+<script>
+    var data=[1,3,5,7,8,4,3,7,9] 
+    var width=500,height=250,margin={left:50,top:30,right:20,bottom:20}
+    g_width=width-margin.left-margin.right,
+    g_heigh=height-margin.top-margin.bottom
+    //缩放
+    var scale_x=d3.scaleLinear()//X线性缩放
+    .domain([0,data.length-1])//输入范围
+    .range([0,g_width])//输出范围
+    var scale_y=d3.scaleLinear()//Y线性缩放
+    .domain([d3.max(data),0])//输入范围
+    .range([0,g_heigh])//输出范围
+
+    //添加svg  
+    var svg=d3.select('#container').append('svg')
+    //添加属性
+    .attr('width',width)
+    .attr('height',height)
+    //在svg元素添加偏移量
+    var g=d3.select('svg')
+    .append('g')
+    .attr('transform',"translate("+margin.left+","+margin.top+")")
+    //绘制曲线
+    var line_genertator=d3.line()
+    .x(function(d,i){return scale_x(i)})//d是数据,i是下标
+    .y(function(d,i){return scale_y(d)})//1,3,5 
+    .curve(d3.curveBasis);//平滑曲线
+    
+    //绘制曲线和面积
+    var area_genertator=d3.area()
+    .x(function(d,i){return scale_x(i)})//d是数据,i是下标
+    .y0(g_heigh)//y0是坐标轴
+    .y1(function(d,i){return scale_y(d)})//y1是生成的曲线
+    .curve(d3.curveBasis);//平滑曲线
+
+    var path =d3.select('g')
+    .append('path')
+    .attr('d',area_genertator(data))
+    .style("fill", "steelblue") //设置填充样式
+    path.attr('stroke','#4682b4')//线颜色
+    path.attr('stroke-width',2)//线宽
+    path.attr('fill','none')//不填充
+    //坐标轴
+    var xAxis = d3.axisBottom(scale_x)
+    .tickFormat(d3.format("d"))//坐标轴为整数
+    var yAxis = d3.axisLeft(scale_y);
+    //添加曲线
+    g.append('g')
+    .call(xAxis)
+    .attr('transform',"translate(0,"+g_heigh+")")
+    
+    g.append('g')
+    .call(yAxis)
+
+    g.append('text')//Y轴添加标签
+    .text('Price($)')
+    .attr('transform',"rotate(-90)")//标签旋转90
+    .attr('text-anchor',"end")
+    .attr('dy',"1em")//该dy属性指示沿着y轴在元素或其内容的位置上的移位。
+
+</script>
+</html> 
